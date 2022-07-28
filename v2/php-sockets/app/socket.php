@@ -12,14 +12,16 @@
         public function __construct()
         {
             $this->clients = new \SplObjectStorage;
+            $this->id_list=[];
         }
     
         public function onOpen(ConnectionInterface $conn) {
     
             // Store the new connection in $this->clients
             $this->clients->attach($conn);
-    
+            array_push($this->id_list,$conn->resourceId);
             echo "New connection! ({$conn->resourceId})\n";
+            print_r($this->id_list);
         }
 
         public function onMessage(ConnectionInterface $from, $msg)
@@ -29,7 +31,7 @@
                 if($from->resourceId== $client->resourceId){
                     continue;
                 }
-
+                
                 $client->send("Client $from->resourceId said $msg");
             }
         }
@@ -40,13 +42,24 @@
             $this->clients->detach($conn);
 
             echo "Connection {$conn->resourceId} has disconnected\n";
+            $this->remVal($conn->resourceId,$this->id_list);
+            print_r($this->id_list);
+            $conn->close();
+
         }
 
         public function onError(ConnectionInterface $conn, \Exception $e)
         {
             echo "An error has occurred: {$e->getMessage()}\n";
-
+            $this->remVal($conn->resourceId,$this->id_list);
             $conn->close();
+        }
+
+        public function remVal($val,&$arr){
+            while(array_search($val,$arr)!==false){
+                $index =array_search($val,$arr);
+                array_splice($arr, $index, 1);
+            }
         }
 
 

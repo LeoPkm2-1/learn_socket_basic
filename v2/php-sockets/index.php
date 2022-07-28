@@ -13,6 +13,9 @@
         </style>
     </head>
     <body>
+
+        <h1>Choose friend</h1>
+        <div class="friend-list"></div>
         <input type="text" id="message" />
         <button onclick="transmitMessage()">Send</button>
         <script>
@@ -27,7 +30,7 @@
             }
 
             socket.onmessage = function(e) {
-                alert( e.data );
+                console.log( e.data );
             }
         </script>
     </body>
